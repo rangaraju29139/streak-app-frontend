@@ -1,18 +1,9 @@
-import logo from "./logo.svg";
 import "./App.css";
-import Navigation from "./components/navigation/Navigation";
-import Footer from "./components/footer/Footer";
-import Body from "./components/Body";
+
+import SecuredRouter from "./components/router/SecuredRouter";
 
 function App() {
-  return (
-    <>
-      <Navigation></Navigation>
-      <Body></Body>
-
-      <Footer></Footer>
-    </>
-  );
+  return <SecuredRouter></SecuredRouter>;
 }
 
 export default App;
