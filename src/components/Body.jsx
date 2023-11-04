@@ -1,13 +1,16 @@
 import { useEffect, useState } from "react";
-import DoneList from "./DoneList";
-import NotDoneList from "./NotDoneList";
+
 import axios from "axios";
 import Loading from "./Loading";
+import ShowTasks from "./ShowTasks";
 
 export default function Body() {
   const [taskData, setTaskData] = useState(null);
   const [errorData, setErrorData] = useState(null);
-  const [refresh, setRefresh] = useState(false);
+  const [refresh, setRefresh] = useState(true);
+
+  const [doneTaskList, setDoneTaskList] = useState(null);
+  const [notDoneTaskList, setNotDoneTaskList] = useState(null);
 
   useEffect(() => {
     axios
@@ -15,16 +18,23 @@ export default function Body() {
       .then((response) => {
         console.log(response.data);
         setTaskData(response.data);
+        setDoneTaskList(() => {
+          return response.data.filter((task) => task.done === true);
+        });
+        setNotDoneTaskList(() => {
+          return response.data.filter((task) => task.done === false);
+        });
       })
       .catch((error) => {
         console.log(error);
         setErrorData(error);
       });
-  }, []);
+    console.log("TaskData: " + taskData);
+  }, [refresh, taskData]);
 
   return (
     <>
-      <div className="container px-2 border shadow rounded vh-100">
+      <div className="container px-2 border shadow rounded vh-auto">
         {errorData && (
           <>
             <div class="alert alert-danger" role="alert">
@@ -37,7 +47,7 @@ export default function Body() {
             <Loading></Loading>
           </>
         )}
-        {taskData && taskData.length == 0 && (
+        {taskData && taskData.length === 0 && (
           <>
             <div class="alert alert-warning" role="alert">
               No Tasks Found
@@ -47,8 +57,18 @@ export default function Body() {
         {taskData && taskData.length > 0 && (
           <>
             <div className="r py-3 mx-auto">
-              <DoneList taskData={taskData}></DoneList>
-              <NotDoneList taskData={taskData}></NotDoneList>
+              <ShowTasks
+                taskData={notDoneTaskList}
+                refresh={refresh}
+                setRefresh={setRefresh}
+                heading={"Tasks to Complete"}
+              ></ShowTasks>
+              <ShowTasks
+                taskData={doneTaskList}
+                refresh={refresh}
+                setRefresh={setRefresh}
+                heading={"completed Tasks"}
+              ></ShowTasks>
             </div>
           </>
         )}
