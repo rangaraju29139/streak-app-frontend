@@ -1,5 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrash } from "@fortawesome/free-solid-svg-icons";
 
 export default function ShowTasks({ taskData, refresh, setRefresh, heading }) {
   const [showAddInput, setShowAddInput] = useState(false);
@@ -48,6 +50,19 @@ export default function ShowTasks({ taskData, refresh, setRefresh, heading }) {
     setNewTaskName(event.target.value);
   };
 
+  const handleDelete = (event, taskId) => {
+    console.log("task deleted for " + taskId);
+    axios
+      .delete(`http://localhost:8080/api/v1/tasks/${taskId}/delete`)
+      .then((response) => {
+        console.log(response.data);
+        setRefresh(!refresh);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   return (
     <>
       <div className="container  border rounded shadow mb-4 py-2">
@@ -56,8 +71,7 @@ export default function ShowTasks({ taskData, refresh, setRefresh, heading }) {
         </div>
         <hr className="hr-blurry py-2"></hr>
         <div className="container">
-          <ul>
-            {/** 
+          {/** 
         <thead>
               <tr>
                 <th scope="col">IsDone</th>
@@ -68,17 +82,23 @@ export default function ShowTasks({ taskData, refresh, setRefresh, heading }) {
             </thead>
     
     */}
-            <ul>
-              {(taskData == null || taskData.length === 0) && (
-                <>
-                  <div className="alert alert-warning">No {heading} Found</div>
-                </>
-              )}
-              {taskData &&
-                taskData.map((task) => (
+
+          {(taskData == null || taskData.length === 0) && (
+            <>
+              <div className="alert alert-warning">No {heading} Found</div>
+            </>
+          )}
+
+          {taskData &&
+            taskData.map((task) => (
+              <>
+                <ul
+                  key={task.id}
+                  className=" list-inline border roounded shadow py-2 px-2 my-auto align-middle d-flex justify-content-between"
+                >
                   <ul
+                    className="list-inline d-flex justify-content-between"
                     key={task.id}
-                    className=" list-inline border roounded shadow py-2 px-2 my-auto align-middle d-flex justify-content-between"
                   >
                     <li>
                       <input
@@ -88,7 +108,12 @@ export default function ShowTasks({ taskData, refresh, setRefresh, heading }) {
                         onChange={(event) => handleDone(event, task.id)}
                       />
                     </li>
-                    <li className="px-1"> {task.taskName}</li>
+                    <li className="px-1">{task.taskName}</li>
+                  </ul>
+                  <ul
+                    className="list-inline d-flex justify-content-between"
+                    key={task.id}
+                  >
                     <li>
                       🔥<span>{task.streakCount}</span>
                     </li>
@@ -100,29 +125,35 @@ export default function ShowTasks({ taskData, refresh, setRefresh, heading }) {
                         Today Task Completed
                       </button>
                     </li>
-                  </ul>
-                ))}
 
-              {heading === "Tasks to Complete" && showAddInput && (
-                <>
-                  <input
-                    type="name"
-                    className="form-control my-2 "
-                    placeholder="Enter New Task to Acomplish"
-                    onChange={handleNewTaskName}
-                  ></input>
-                </>
-              )}
-              {heading === "Tasks to Complete" && (
-                <button
-                  className="btn btn-success my-2"
-                  onClick={handleAddButton}
-                >
-                  AddTask
-                </button>
-              )}
-            </ul>
-          </ul>
+                    <li>
+                      <button
+                        className="btn btn-danger"
+                        onClick={(event) => handleDelete(event, task.id)}
+                      >
+                        <FontAwesomeIcon icon={faTrash} />
+                      </button>
+                    </li>
+                  </ul>
+                </ul>
+              </>
+            ))}
+
+          {heading === "Tasks to Complete" && showAddInput && (
+            <>
+              <input
+                type="name"
+                className="form-control my-2 "
+                placeholder="Enter New Task to Acomplish"
+                onChange={handleNewTaskName}
+              ></input>
+            </>
+          )}
+          {heading === "Tasks to Complete" && (
+            <button className="btn btn-success my-2" onClick={handleAddButton}>
+              AddTask
+            </button>
+          )}
         </div>
       </div>
     </>

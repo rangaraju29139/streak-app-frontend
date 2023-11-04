@@ -5,7 +5,7 @@ import Loading from "./Loading";
 import ShowTasks from "./ShowTasks";
 
 export default function Body() {
-  const [taskData, setTaskData] = useState(null);
+  const [taskData, setTaskData] = useState([]);
   const [errorData, setErrorData] = useState(null);
   const [refresh, setRefresh] = useState(true);
 
@@ -16,14 +16,22 @@ export default function Body() {
     axios
       .get("http://localhost:8080/api/v1/tasks")
       .then((response) => {
-        console.log(response.data);
-        setTaskData(response.data);
-        setDoneTaskList(() => {
-          return response.data.filter((task) => task.done === true);
-        });
-        setNotDoneTaskList(() => {
-          return response.data.filter((task) => task.done === false);
-        });
+        if (
+          response == null ||
+          response.data == null ||
+          response.data.length === 0
+        ) {
+          setTaskData([]);
+        } else {
+          console.log(response.data);
+          setTaskData(response.data);
+          setDoneTaskList(() => {
+            return taskData.filter((task) => task.done === true);
+          });
+          setNotDoneTaskList(() => {
+            return taskData.filter((task) => task.done === false);
+          });
+        }
       })
       .catch((error) => {
         console.log(error);
@@ -42,19 +50,13 @@ export default function Body() {
             </div>
           </>
         )}
-        {errorData == null && taskData == null && (
+        {taskData == null && (
           <>
             <Loading></Loading>
           </>
         )}
-        {taskData && taskData.length === 0 && (
-          <>
-            <div class="alert alert-warning" role="alert">
-              No Tasks Found
-            </div>
-          </>
-        )}
-        {taskData && taskData.length > 0 && (
+
+        {taskData && (
           <>
             <div className="r py-3 mx-auto">
               <ShowTasks
@@ -67,7 +69,7 @@ export default function Body() {
                 taskData={doneTaskList}
                 refresh={refresh}
                 setRefresh={setRefresh}
-                heading={"completed Tasks"}
+                heading={"Completed Tasks"}
               ></ShowTasks>
             </div>
           </>
