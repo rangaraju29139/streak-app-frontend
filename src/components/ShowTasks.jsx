@@ -114,7 +114,7 @@ export default function ShowTasks({ taskData, refresh, setRefresh, heading }) {
                     className="list-inline d-flex justify-content-between"
                     key={task.id}
                   >
-                    <li>
+                    <li className="p-1">
                       🔥<span>{task.streakCount}</span>
                     </li>
                     <li>

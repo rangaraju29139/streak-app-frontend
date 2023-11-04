@@ -42,7 +42,7 @@ export default function Body() {
 
   return (
     <>
-      <div className="container px-2 border shadow rounded vh-auto">
+      <div className="container px-2 border shadow rounded min-vh-100">
         {errorData && (
           <>
             <div class="alert alert-danger" role="alert">
